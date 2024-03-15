@@ -1,0 +1,155 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "fname": "Deep",
+      "lname": "Lotwala",
+      "email": "admin@gmail.com",
+      "password": "admin",
+      "isAdmin": true,
+      "isLoggedIn": false
+    },
+    {
+      "id": "be6d",
+      "fname": "Deep",
+      "lname": "Lotwala",
+      "email": "deeplotwala26@gmail.com",
+      "password": "123456789",
+      "keepLoggedIn": true,
+      "acceptTerms": true,
+      "isAdmin": false,
+      "isLoggedIn": false
+    },
+    {
+      "id": "4fb6",
+      "fname": "Fenil",
+      "email": "fenilmodi@gmail.com",
+      "lname": "Modi",
+      "password": "123456",
+      "keepLoggedIn": true,
+      "acceptTerms": true,
+      "isAdmin": false,
+      "isLoggedIn": false
+    },
+    {
+      "id": "5588",
+      "fname": "Rohit",
+      "lname": "Patil",
+      "email": "rohitpatil@gmail.com",
+      "password": "1234556",
+      "keepLoggedIn": true,
+      "acceptTerms": true,
+      "isAdmin": false,
+      "isLoggedIn": false
+    },
+    {
+      "id": "6248",
+      "fname": "Vishal",
+      "lname": "Ahuja",
+      "email": "vishalahuja@gmail.com",
+      "password": "1234567",
+      "keepLoggedIn": false,
+      "acceptTerms": true,
+      "isAdmin": false,
+      "isLoggedIn": false
+    },
+    {
+      "id": "a0f4",
+      "fname": "Deep",
+      "lname": "Lotwala",
+      "email": "deeplotwala@gmail.com",
+      "password": "1234567",
+      "keepLoggedIn": false,
+      "acceptTerms": false,
+      "isAdmin": false,
+      "isLoggedIn": false
+    }
+  ],
+  "products": [
+    {
+      "id": "298f",
+      "name": "test",
+      "desc": "test",
+      "category": "test",
+      "brand": "test",
+      "sku": "test",
+      "stock": 123,
+      "price": 123,
+      "salePrice": 123
+    },
+    {
+      "id": "ffe6",
+      "name": "test",
+      "desc": "test",
+      "category": "test11",
+      "brand": "test",
+      "sku": "test",
+      "stock": 123,
+      "price": 134,
+      "salePrice": 1423
+    },
+    {
+      "id": "7e08",
+      "name": "test",
+      "desc": "test",
+      "category": "test12",
+      "brand": "test",
+      "sku": "test",
+      "stock": 123,
+      "price": 123,
+      "salePrice": 23
+    },
+    {
+      "id": "0cac",
+      "name": "test",
+      "desc": "",
+      "category": "",
+      "brand": "",
+      "sku": "",
+      "stock": "",
+      "price": "",
+      "salePrice": ""
+    }
+  ],
+  "Orders": [
+    {
+      "orderId": "123456",
+      "products": [
+        {
+          "productID": "298f",
+          "quantity": 2,
+          "amount": 246
+        }
+      ],
+      "purchaseDate": "Mar 14 2024",
+      "CustomerId": "4fb6",
+      "Status": "Delivered"
+    },
+    {
+      "orderId": "1234",
+      "products": [
+        {
+          "productID": "298f",
+          "quantity": 2,
+          "amount": 246
+        }
+      ],
+      "purchaseDate": "Mar 14 2024",
+      "CustomerId": "1",
+      "Status": "Delivered"
+    },
+    {
+      "orderId": "1234",
+      "products": [
+        {
+          "productID": "298f",
+          "quantity": 2,
+          "amount": 246
+        }
+      ],
+      "purchaseDate": "Mar 14 2024",
+      "CustomerId": "be6d",
+      "Status": "Delivered"
+    }
+  ]
+}

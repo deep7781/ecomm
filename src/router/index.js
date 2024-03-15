@@ -1,25 +1,61 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import { createRouter, createWebHistory } from "vue-router";
+import store from "@/store";
 
 const routes = [
   {
-    path: '/',
-    name: 'home',
-    component: HomeView
+    path: "/login",
+    name: "Login",
+    component: () => import("@/components/Login.vue"),
   },
   {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
-  }
-]
+    path: "/register",
+    name: "Register",
+    component: () => import("@/components/Register.vue"),
+  },
+  {
+    path: "/admin",
+    name: "Admin",
+    component: () => import("@/Layouts/AdminLayout.vue"),
+    beforeEnter: (to, from, next) => {
+      if (localStorage.getItem("isLoggedIn")) {
+        next();
+      } else {
+        next("/login");
+      }
+    },
+    children: [
+      {
+        path: "/admin/product/:id",
+        name: "edit",
+        component: () => import("@/views/Admin/EditProduct.vue"),
+      },
+      {
+        path: "/admin/product",
+        name: "adminProducts",
+        component: () => import("@/views/Admin/AllProducts.vue"),
+      },
+      {
+        path: "/admin/Dashboard",
+        name: "dashboard",
+        component: () => import("@/views/Admin/Dashboard.vue"),
+      },
+      {
+        path: "/admin/product/new",
+        name: "AddNew",
+        component: () => import("@/views/Admin/AddNewProduct.vue"), // Added .vue extension
+      },
+      {
+        path: "/admin/Orders",
+        name: "Orders",
+        component: () => import("@/views/Admin/Orders.vue"),
+      },
+    ],
+  },
+];
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
-  routes
-})
+  routes,
+});
 
-export default router
+export default router;
