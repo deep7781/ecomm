@@ -3,7 +3,6 @@
         <Notification v-show="notification" :message="this.message" />
     </div>
     <div class="addNew">
-        {{ "hello" }}
         <div class="productsNavbar">
             <span class="proDet">
                 Product Details
