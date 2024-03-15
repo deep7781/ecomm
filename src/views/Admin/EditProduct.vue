@@ -60,7 +60,21 @@
                         </div>
                     </form>
                 </div>
-                <div class="right"></div>
+                <div class="right">
+                    <div class="imagePreview">
+                        <img id="preview" :src="previewImage" v-if="previewImage" class="imagePreview">
+                        <div v-else="!previewImage" class="whenNoImage"></div>
+                    </div>
+                    <div class="custom-file-upload">
+                        <label for="imageInput" class="imageInput"> <img :src="dummyImage" alt="dummyimage">
+                            <span>
+                                <p>Drop your imager here, or browse</p>
+                                <p>Jpeg, png are allowed</p>
+                            </span>
+                        </label>
+                        <input type="file" id="imageInput" @change="onImageChange" />
+                    </div>
+                </div>
             </div>
             <div class="Btncont">
                 <div class="buttons">
@@ -76,9 +90,13 @@
 import router from '@/router'
 import Notification from "../../components/Notification.vue"
 import { mapActions } from 'vuex'
+import dummyImage from '@/assets/Admin/dummyImage.svg'
 export default {
     data() {
         return {
+            dummyImage,
+            selectedImage: null,
+            previewImage: null,
             Prname: "",
             Prdesc: "",
             Prcat: "",
@@ -107,6 +125,16 @@ export default {
             'fetchProducts',
             'fetchProductsById'
         ]),
+        onImageChange(event) {
+            this.selectedImage = event.target.files[0]
+            if (this.selectedImage) {
+                const reader = new FileReader()
+                reader.readAsDataURL(this.selectedImage)
+                reader.onload = (e) => {
+                    this.previewImage = e.target.result
+                }
+            }
+        },
         async onUpdateProducts() {
             const productId = this.$route.params.id
             const productData = {
@@ -119,6 +147,7 @@ export default {
                 stock: this.Prstock,
                 price: this.PrPrice,
                 salePrice: this.Prsale,
+                imageUrl: this.previewImage
             }
             try {
                 await this.updateProducts(productData)
@@ -142,18 +171,8 @@ export default {
         },
         async fetchData() {
             const productId = this.$route.params.id
-            // const data = await this.fetchProductsById(productId);
-            // console.log("from edit", data);
-            // this.Prname = data.name;
-            // this.Prdesc = data.desc;
-            // this.Prcat = data.category;
-            // this.Prbrand = data.brand;
-            // this.PrSku = data.sku;
-            // this.Prstock = data.stock;
-            // this.PrPrice = data.price;
-            // this.Prsale = data.salePrice;
             try {
-                const res = await fetch(`http://192.168.29.85:3000/products/${productId}`);
+                const res = await fetch(`http://192.168.29.85:3001/products/${productId}`);
                 const data = await res.json();
                 console.log("From edit", data);
                 this.Prname = data.name;
@@ -164,6 +183,7 @@ export default {
                 this.Prstock = data.stock;
                 this.PrPrice = data.price;
                 this.Prsale = data.salePrice;
+                this.previewImage = data.imageUrl
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -172,6 +192,65 @@ export default {
 }
 </script>
 <style scoped>
+input[type="file"] {
+    display: none;
+}
+
+.imageInput {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+img {
+    width: 64px;
+    height: 64px;
+}
+
+.custom-file-upload span {
+    color: #70706E;
+    text-align: center;
+    font-family: "Open Sans";
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+}
+
+.custom-file-upload {
+    display: flex;
+    flex-direction: column;
+    width: 457px;
+    padding: 16px;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    border-radius: 8px;
+    border: 1px dashed #232321;
+}
+
+.whenNoImage {
+    width: 441px;
+    flex-shrink: 0;
+    align-self: stretch;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.20);
+}
+
+.imagePreview {
+    display: flex;
+    width: 457px;
+    height: 444px;
+    padding: 8px;
+    align-items: flex-start;
+    gap: 10px;
+    border-radius: 16px;
+    background: #FAFAFA;
+}
+
 .notiClass {
     position: fixed;
     left: 40%;
@@ -369,6 +448,7 @@ button {
 }
 
 .add:hover,
+.delete:hover,
 .cancel:hover {
     transform: scale(1.1);
 }

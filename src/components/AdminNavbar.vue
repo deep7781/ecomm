@@ -1,7 +1,19 @@
 <template>
     <div class="navbar">
         <div class="icons">
-            <img :src=this.search alt="search">
+            <!-- <transition name="fade"> -->
+            <div class="searchField">
+                <div class="hiddenSearch" v-show="searchToggle">
+                    <img :src=this.search alt="search" />
+                    <input type="text" v-model="searchText" placeholder="Search Here">
+                    <img :src=this.cross alt="cross" class="cross" @click="searchToggle = false">
+                </div>
+            </div>
+            <!-- </transition> -->
+            <!-- <transition> -->
+            <img :src=this.search v-show="!searchToggle" alt="search" @click="searchToggle = true">
+            <!-- </transition> -->
+
             <img :src=this.bell alt="bell">
             <div class="admin" @click="this.adminToggle = !this.adminToggle">
                 <span>
@@ -31,6 +43,7 @@ import bell from "../assets/Admin/notification.svg"
 import search from "../assets/Admin/search.svg"
 import down from "../assets/Admin/downArrow.svg"
 import logout from "../assets/Admin/logout.svg"
+import cross from "@/assets/Admin/cross.svg"
 import { mapActions } from "vuex"
 export default {
     data() {
@@ -40,6 +53,8 @@ export default {
             down,
             logout,
             adminToggle: false,
+            searchToggle: false,
+            cross
         }
     },
     methods: {
@@ -61,6 +76,81 @@ export default {
 </script>
 
 <style scoped>
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity .5s;
+}
+
+.fade-enter,
+.fade-leave-to {
+    opacity: 0;
+}
+
+.cross {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+.hiddenSearch {
+    display: flex;
+    flex-direction: row;
+    width: auto;
+    height: 20px;
+    padding: 8px 16px;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+    border-radius: 8px;
+    border: 1px solid #003F62;
+}
+
+.hiddenSearch img {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+}
+
+
+.searchField input {
+    border: none;
+    outline: none;
+    /* width: 90%; */
+    /* border-radius: 5px; */
+    /* padding: 10px; */
+    /* width: 58px; */
+    background: #FAFAFA;
+    color: #1C1C1A;
+    font-family: "Rubik";
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    letter-spacing: 0.25px;
+    text-transform: uppercase;
+}
+
+.searchField input::placeholder {
+    text-align: center;
+    color: #1C1C1A;
+    font-family: "Rubik";
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+    letter-spacing: 0.25px;
+    /* text-transform: uppercase; */
+    font-style: italic;
+
+}
+
+.searchField {
+    /* display: flex;
+    flex-direction: row;
+    gap: 10px; */
+}
+
 .goArrow {
     transform: rotate(270deg);
 }

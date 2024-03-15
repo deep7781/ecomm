@@ -29,7 +29,7 @@
                     :class="{ 'productCard': product.length >= 2, 'productCard1': product.length == 1 }">
                     <div class="details">
                         <div class="image">
-                            <img :src=this.logo :alt=product.name>
+                            <img v-if="pro.images" :src=pro.imageUrl[0].image || pro.imageUrl.name :alt=pro.name>
                         </div>
                         <div class="allData">
                             <div class="pr">
@@ -87,7 +87,7 @@ export default {
             logo,
             message: '',
             notification: false,
-            toggleMenuOpen: false
+            // toggleMenuOpen: false
         };
     },
     computed: {
@@ -99,11 +99,6 @@ export default {
     },
     mounted() {
         this.fetchData();
-        document.addEventListener('click', this.closeToggleMenu);
-    },
-    destroyed() {
-
-        document.removeEventListener('click', this.closeToggleMenu);
     },
     watch() {
         this.deleteAction();
@@ -134,7 +129,7 @@ export default {
         toggleMenu(pro) {
 
             pro.toggle = !pro.toggle;
-            this.toggleMenuOpen = pro.toggle;
+            // this.toggleMenuOpen = pro.toggle;
             // console.log("clicked")
             this.product.forEach(p => {
                 if (p !== pro && p.toggle) {
@@ -409,11 +404,13 @@ hr {
     /* margin-bottom: 30px; */
 }
 
-.productCard:hover {
+.productCard:hover,
+.productCard1:hover {
     -webkit-box-shadow: 0px 0px 29px -7px rgba(0, 0, 0, 0.68);
     -moz-box-shadow: 0px 0px 29px -7px rgba(0, 0, 0, 0.68);
     box-shadow: 0px 0px 29px -7px rgba(0, 0, 0, 0.68);
     cursor: pointer;
+    /* transform: scale(1.04); */
 }
 
 .allProducts {

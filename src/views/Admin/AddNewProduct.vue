@@ -61,11 +61,30 @@
                     </form>
                 </div>
                 <div class="right">
-                    <!-- <div>
-                        <input type="file" ref="fileInput" @change="handleFileChange">
-                        <button @click="uploadImage">Upload Image</button>
-                        <img :src="imageUrl" alt="Uploaded Image" v-if="imageUrl">
-                    </div> -->
+
+                    <div class="imagePreview">
+                        <img v-if="images.length" :src="images[0].image" alt="Placeholder Image" class="imagePreview">
+                        <img id="preview" :src="previewImage || selectedImage" v-if="previewImage || selectedImage"
+                            class="imagePreview">
+                    </div>
+                    <div class="custom-file-upload">
+                        <label for="imageInput" class="imageInput">
+                            <img :src="dummyImage" alt="dummyimage">
+                            <span>
+                                <p>Drop your image here, or browse</p>
+                                <p>Jpeg, png are allowed</p>
+                            </span>
+                        </label>
+                        <input type="file" id="imageInput" @change="handleImageUpload">
+                    </div>
+                    <div class="imagePreview1">
+                        <div class="imageCard" v-for="(image, index) in images" :key="index">
+                            <img :src="image.image" alt="uploaded Image">
+                            <!-- {{ image }} -->
+                            <span class="fileName">{{ image.name }}</span>
+                            <img :src="this.cross" alt="cancel" class="cross" @click="removeImage(index)">
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="Btncont">
@@ -79,12 +98,18 @@
 </template>
 
 <script>
+import cross from "@/assets/Admin/cross.svg";
 import { mapActions } from "vuex"
 import Notification from "../../components/Notification.vue"
 import router from "@/router"
+import dummyImage from "@/assets/Admin/dummyImage.svg"
 export default {
     data() {
         return {
+            cross,
+            dummyImage,
+            selectedImage: null,
+            previewImage: null,
             Prname: "",
             Prdesc: "",
             Prcat: "",
@@ -95,7 +120,8 @@ export default {
             Prsale: "",
             Prtags: "",
             message: "",
-            notification: false
+            notification: false,
+            images: []
         }
     }, components: {
         Notification
@@ -104,6 +130,34 @@ export default {
         ...mapActions(["addProducts"]),
         cancel() {
             router.back();
+        },
+        handleImageUpload(event) {
+            const files = event.target.files;
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const fileName = file.name;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const imageUrl = e.target.result;
+                    this.images.push({ image: imageUrl, name: fileName });
+                };
+
+                reader.readAsDataURL(file);
+            }
+        },
+        removeImage(index) {
+            this.images.splice(index, 1);
+            document.getElementById('imagePreview').children[index].remove();
+        },
+        uploadImage() {
+            const formData = new FormData()
+            formData.append('image', this.selectedImage)
+            axios.post('http://192.168.29.25:3001/test').then(response => {
+                console.log("image uploaded successfully");
+            })
+                .catch(error =>
+                    console.error(error))
+
         },
         async addNewProduct() {
             const productData = {
@@ -116,6 +170,7 @@ export default {
                 stock: this.Prstock,
                 price: this.PrPrice,
                 salePrice: this.Prsale,
+                imageUrl: this.images
             }
             try {
                 await this.addProducts(productData)
@@ -127,46 +182,110 @@ export default {
             } catch (error) {
                 this.message = 'Error adding product'
                 this.notification = true
-                // console.error("Error adding products", error);
             }
             setTimeout(() => {
                 this.notification = false;
             }, 3000)
-            //     const response = await fetch("http://localhost:3000/products", {
-            //         method: "POST",
-            //         headers: {
-            //             'Content-Type': 'application/json'
-            //         },
-            //         body: JSON.stringify({
-            //             name: this.Prname,
-            //             desc: this.Prdesc,
-            //             category: this.Prcat,
-            //             brand: this.Prbrand,
-            //             sku: this.PrSku,
-            //             stock: this.Prstock,
-            //             price: this.PrPrice,
-            //             salePrice: this.Prsale,
-            //         })
-            //     })
-            //     if (response.ok) {
-            //         this.message = 'SuccessFully added product!';
-            //         this.notification = true;
-            //         setTimeout(() => {
-            //             router.push('/admin/product')
-            //         }, 3000)
-            //     } else {
-            //         this.message = "Error adding product"
-            //         this.notification = true;
-            //     }
-            //     setTimeout(() => {
-            //         this.notification = false
-            //     }, 3000)
         }
     }
 }
 </script>
 
 <style scoped>
+.imagePreview1 {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    align-self: stretch;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+.cross {
+    width: 32px;
+    height: 32px;
+}
+
+.imageCard {
+    display: flex;
+    padding: 16px;
+    justify-content: space-between;
+    width: 457px;
+    align-items: center;
+    gap: 16px;
+    align-self: stretch;
+    border-radius: 8px;
+    background: #FAFAFA;
+
+}
+
+.imageCard span {
+    color: #232321;
+    font-family: "Open Sans";
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+}
+
+.imageInput {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+img {
+    width: 64px;
+    height: 64px;
+}
+
+.custom-file-upload span {
+    color: #70706E;
+    text-align: center;
+    font-family: "Open Sans";
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+}
+
+.custom-file-upload {
+    display: flex;
+    flex-direction: column;
+    width: 457px;
+    padding: 16px;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    border-radius: 8px;
+    border: 1px dashed #232321;
+}
+
+.whenNoImage {
+    width: 441px;
+    flex-shrink: 0;
+    align-self: stretch;
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.20);
+}
+
+.imagePreview {
+    display: flex;
+    width: 457px;
+    height: 444px;
+    padding: 8px;
+    align-items: flex-start;
+    gap: 10px;
+    border-radius: 16px;
+    background: #FAFAFA;
+}
+
 .notiClass {
     position: fixed;
     left: 40%;
