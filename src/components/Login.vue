@@ -23,9 +23,11 @@
                             <input type="text" placeholder="Email" v-model=this.user.email>
                             <!-- {{ email }} -->
                         </div>
+                        <span class="errorMsg" v-if="isEmpty && this.user.email == ''">Email can't be empty</span>
                         <div class="loginFields">
                             <input type="password" placeholder="Password" v-model="this.user.password">
                         </div>
+                        <span class="errorMsg" v-if="isEmpty && this.user.password == ''">Password can't be empty</span>
                         <div class="keepLoggedIn">
                             <input type="checkbox" name="keepLoggedIn" v-model="user.keepLoggedIn">
                             Keep me logged in
@@ -82,7 +84,8 @@ export default {
                 isLoggedIn: false
             },
             message: '',
-            notification: false
+            notification: false,
+            isEmpty: false
         };
     }, components: {
         Notification
@@ -97,44 +100,54 @@ export default {
         }),
         ...mapMutations('auth', ['setIsLoggedIn', 'setIsAdmin']),
         async handleSubmit(e) {
-            const resp = await fetch(`http://192.168.29.85:3000/users`);
-            const data = await resp.json();
-            let isCredentialsValid = false;
-            data.forEach((item) => {
-                if (this.user.email === item.email && this.user.password === item.password) {
-                    if (item.isAdmin) {
-                        // this.setIsAdmin(true)
-                        // this.setIsLoggedIn(true)
-                        this.$store.state.auth.user.isAdmin = true
-                        this.$store.state.auth.user.isLoggedIn = true
-                        router.push({ path: '/admin/Dashboard' });
-                        this.message = 'You have successfully logged in as an admin.'
-                        this.notification = true
-                        console.log('hey');
-                        console.log('After loginUser', this.$store.state.auth.user);
-                        // this.isLoggedIn = true
-                        isCredentialsValid = true;
+            if (this.user.password == '' || this.user.email == '') {
+                this.isEmpty = true
+            } else {
 
-                    } else {
-                        this.loginUser({ ...item, keepLoggedIn: this.user.keepLoggedIn, isAdmin: false });
-                        isCredentialsValid = true;
-                        return;
+                const resp = await fetch(`http://192.168.29.85:3001/users`);
+                const data = await resp.json();
+                let isCredentialsValid = false;
+                data.forEach((item) => {
+                    if (this.user.email === item.email && this.user.password === item.password) {
+                        if (item.isAdmin) {
+                            // this.setIsAdmin(true)
+                            // this.setIsLoggedIn(true)
+                            this.$store.state.auth.user.isAdmin = true
+                            this.$store.state.auth.user.isLoggedIn = true
+                            router.push({ name: 'dashboard' });
+                            this.$store.commit('setLoginMessage', 'Welcome, Admin!')
+                            setTimeout(() => {
+                                this.$store.commit('setLoginMessage', '')
+                            }, 5000)
+                            // router.push({ name: 'dashboard', params: { message: 'Welcome admin' } });
+                            this.message = 'You have successfully logged in as an admin.'
+                            this.notification = true
+                            // console.log('hey');
+                            // console.log('After loginUser', this.$store.state.auth.user);
+                            // this.isLoggedIn = true
+                            isCredentialsValid = true;
+
+                        } else {
+                            this.loginUser({ ...item, keepLoggedIn: this.user.keepLoggedIn, isAdmin: false });
+                            isCredentialsValid = true;
+                            return;
+                        }
                     }
-                }
-            });
+                });
 
-            if (isCredentialsValid) {
-                this.message = 'Success';
-                this.notification = true
-                localStorage.setItem('isLoggedIn', JSON.stringify(true));
+                if (isCredentialsValid) {
+                    this.message = 'Success';
+                    this.notification = true
+                    localStorage.setItem('isLoggedIn', JSON.stringify(true));
+                }
+                else {
+                    this.message = 'Invalid Credentials';
+                    this.notification = true
+                }
+                setTimeout(() => {
+                    this.notification = false
+                }, 3000);
             }
-            else {
-                this.message = 'Invalid Credentials';
-                this.notification = true
-            }
-            setTimeout(() => {
-                this.notification = false
-            }, 3000);
         }
     },
     components: { Notification }
@@ -229,9 +242,15 @@ export default {
 
 }
 
+.errorMsg {
+    color: red;
+    font-style: italic;
+    font-family: 'Open Sans';
+}
+
 .loginFields input {
     border: none;
-    color: #79767C;
+    color: black;
     font-family: "Rubik";
     font-size: 16px;
     font-style: normal;

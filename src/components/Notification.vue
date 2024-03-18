@@ -21,7 +21,7 @@ export default {
 <style scoped>  .container {
       background: transparent;
       /* background: #f1eded; */
-      border-radius: 10px;
+      border-radius: 20px;
   }
 
 
@@ -34,7 +34,7 @@ export default {
       padding: 10px;
       text-align: center;
       opacity: 0;
-      border-radius: 5px;
+      border-radius: 15px;
       animation: slideInOut 0.5s ease-in-out forwards;
   }
 
@@ -72,9 +72,10 @@ export default {
 
   .message {
       padding: 20px;
-      font-family: 'Rubik';
+      font-family: 'Open sans';
       border: 1px solid black;
       width: 300px;
-      background: #f1eded;
+      border-radius: 10px;
+      background: #fff;
   }
 </style>

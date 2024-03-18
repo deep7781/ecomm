@@ -6,6 +6,8 @@ export default createStore({
     isAdmin: false,
     customer: [],
     data: [],
+    loginMessage: "",
+    loading: false,
   },
   getters: {
     getProductById: (state) => (id) => {
@@ -13,6 +15,12 @@ export default createStore({
     },
   },
   mutations: {
+    setLoginMessage(state, message) {
+      state.loginMessage = message;
+    },
+    setLoading(state, payload) {
+      state.loading = payload;
+    },
     setProducts(state, products) {
       state.product = products;
     },
@@ -40,6 +48,7 @@ export default createStore({
   actions: {
     async fetchProducts({ commit }) {
       try {
+        commit("setLoading", true);
         const res = await fetch("http://192.168.29.85:3001/products");
         const data = await res.json();
 
@@ -47,6 +56,8 @@ export default createStore({
         return data;
       } catch (error) {
         console.error("Error fetching data", error);
+      } finally {
+        commit("setLoading", false);
       }
     },
     async fetchProductsById(id) {

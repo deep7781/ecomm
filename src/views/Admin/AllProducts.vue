@@ -1,4 +1,7 @@
 <template>
+    <!-- <div class="loader" v-if="isLoading">
+        <Loader />
+    </div> -->
     <div class="notiClass">
         <Notification v-show="notification" :message="message" />
     </div>
@@ -21,15 +24,19 @@
             </router-link>
         </div>
         <div
-            :class="{ 'ProductsContainer1': product.length === 2 || product.length === 1, 'ProductsContainer': product.length > 2 }">
+            :class="{ 'ProductsContainer1': product && (product.length === 2 || product.length === 1), 'ProductsContainer': product && product.length > 2 }">
 
-            <div v-show="!product.length" class="nothing">Nothing to Display, please Add products to Display</div>
+            <div v-show="!product || !product.length" class="nothing">Nothing to Display, please Add products to Display
+            </div>
+
             <transition-group name="fade">
-                <div v-for="pro in product" :key="pro.id"
+                <div v-for="pro in this.product" :key="pro.id"
                     :class="{ 'productCard': product.length >= 2, 'productCard1': product.length == 1 }">
                     <div class="details">
                         <div class="image">
-                            <img v-if="pro.images" :src=pro.imageUrl[0].image || pro.imageUrl.name :alt=pro.name>
+                            <img v-if="pro.imageUrl" :src=pro.imageUrl[0].image :alt=pro.name>
+                            <!-- <img v-else="pro.imageUrl" :alt=pro.name> -->
+                            {{ console.log(pro) }}
                         </div>
                         <div class="allData">
                             <div class="pr">
@@ -68,7 +75,7 @@
     </div>
 </template>
 
-<script>
+<!-- <script>
 import axios from "axios"
 import router from "@/router"
 import Notification from "@/components/Notification.vue";
@@ -87,18 +94,21 @@ export default {
             logo,
             message: '',
             notification: false,
+            product: []
             // toggleMenuOpen: false
         };
     },
     computed: {
-        ...mapState(["product"])
+        // ...mapState(["product"])
     },
     components: { RouterView, Notification },
     updated() {
         this.fetchData()
+        // this.getProduct()
     },
     mounted() {
         this.fetchData();
+        this.getProduct();
     },
     watch() {
         this.deleteAction();
@@ -106,9 +116,12 @@ export default {
 
     methods: {
         ...mapActions(["fetchProducts", "deleteProduct"]),
+        async getProduct() {
+            // this.product = this.$store.state.product
+        },
         async fetchData() {
             try {
-                await this.fetchProducts()
+                this.product = await this.fetchProducts()
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -148,9 +161,103 @@ export default {
     },
 
 }
+</script> -->
+<script>
+import Loader from "@/components/Loader.vue"
+import axios from "axios"
+import router from "@/router"
+import Notification from "@/components/Notification.vue";
+import "@fortawesome/fontawesome-free/css/all.css";
+import logo from "@/assets/logo.png";
+import { RouterView } from 'vue-router';
+import add from '../../assets/Admin/add.svg'
+import "@fortawesome/fontawesome-free/css/fontawesome.css";
+import "@fortawesome/fontawesome-free/css/solid.css";
+import "@fortawesome/fontawesome-free/css/brands.css";
+import { mapActions, mapState } from "vuex";
+export default {
+    data() {
+        return {
+            add,
+            message: "",
+            notification: false,
+            product: [],
+            dataFetched: false,
+            // isLoading: true
+        };
+    },
+    components: { Notification, Loader },
+    async mounted() {
+
+        if (!this.dataFetched) {
+            await this.fetchData();
+        }
+    },
+    computed: {
+        ...mapState({
+            isLoading: state => state.loading
+        })
+    },
+    updated() {
+        if (!this.dataFetched) {
+            this.fetchData();
+        }
+    },
+    methods: {
+        ...mapActions(["fetchProducts", "deleteProduct"]),
+        async fetchData() {
+            try {
+                this.product = await this.fetchProducts();
+                this.dataFetched = true;
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        },
+        async editAction(id) {
+            router.push({ path: `/admin/product/${id}`, params: { id } });
+        },
+        async deleteAction(id) {
+            await this.deleteProduct(id);
+            this.message = "Deleted Successfully";
+            this.notification = true;
+            setTimeout(() => {
+                this.notification = false;
+            }, 3000);
+        },
+        toggleMenu(pro) {
+            pro.toggle = !pro.toggle;
+            this.product.forEach(p => {
+                if (p !== pro && p.toggle) {
+                    p.toggle = false;
+                }
+            });
+
+            axios
+                .put(`http://192.168.29.85:3001/products/${pro.id}`, {
+                    ...pro,
+                    toggle: pro.toggle
+                })
+                .then(response => {
+                    console.log("Toggle updated in the database:", response.data);
+                })
+                .catch(error => {
+                    console.error("Error updating toggle in the database:", error);
+                });
+        }
+    }
+};
 </script>
 
 <style scoped>
+.loader {
+    position: absolute;
+    display: flex;
+    z-index: 1;
+    /* flex-direction: row; */
+    top: 50%;
+    left: 50%;
+}
+
 .fade-enter-active,
 .fade-leave-active {
     transition: opacity 0.5s;
@@ -321,6 +428,7 @@ hr {
 }
 
 .image {
+    object-fit: cover;
     width: 84px;
     height: 84px;
     display: flex;
@@ -328,6 +436,8 @@ hr {
 
 .image img {
     object-fit: cover;
+    height: 100%;
+    width: 100%;
 }
 
 .prName {

@@ -20,43 +20,52 @@
                         <div class="formInput">
                             <label for="ProductName">Product Name</label>
                             <input type="text" v-model="Prname" placeholder="Type name here">
+                            <span v-show="Prname == '' && isEmpty">Name can't be empty</span>
                         </div>
                         <div class="formInput">
                             <label for="ProductDesc">Product Description</label>
                             <textarea name="productDesc" id="" cols="30" rows="9" placeholder="Type description here"
                                 v-model="Prdesc"></textarea>
+                            <span v-show="Prdesc == '' && isEmpty">Description can't be empty</span>
                         </div>
                         <div class="formInput">
                             <label for="ProductCategory">Category</label>
                             <input type="text" v-model="Prcat" placeholder="Type category here">
+                            <span v-show="Prcat == '' && isEmpty">Category can't be empty</span>
                         </div>
                         <div class="formInput">
                             <label for="ProductBrand">Brand Name</label>
                             <input type="text" v-model="Prbrand" placeholder="Type brand name here">
+                            <span v-show="Prbrand == '' && isEmpty">Brand name can't be empty</span>
                         </div>
                         <div class="group">
                             <div class="formInput">
                                 <label for="SKU">SKU</label>
                                 <input type="text" v-model="PrSku" placeholder="Fox-3983">
+                                <span v-show="PrSku == '' && isEmpty">SKU can't be empty</span>
                             </div>
                             <div class="formInput">
                                 <label for="stock">Stock Quantity</label>
                                 <input type="number" v-model="Prstock" placeholder="1258">
+                                <span v-show="Prstock == '' && isEmpty">Stock can't be empty</span>
                             </div>
                         </div>
                         <div class="group">
                             <div class="formInput">
                                 <label for="Prprice">Regular Price</label>
                                 <input type="number" v-model="PrPrice" placeholder="₹1000">
+                                <span v-show="PrPrice == '' && isEmpty">Price can't be empty</span>
                             </div>
                             <div class="formInput">
                                 <label for="Prsale">Sale Price</label>
                                 <input type="number" v-model="Prsale" placeholder="₹450">
+                                <span v-show="Prsale == '' && isEmpty">Sale price can't be empty</span>
                             </div>
                         </div>
                         <div class="formInput">
                             <label for="Prprice">Tags</label>
                             <input type="number" v-model="Prtags" placeholder="Place Tags Here">
+                            <span v-show="Prtags == '' && isEmpty">Tags can't be empty</span>
                         </div>
                     </form>
                 </div>
@@ -75,9 +84,10 @@
                                 <p>Jpeg, png are allowed</p>
                             </span>
                         </label>
-                        <input type="file" id="imageInput" @change="handleImageUpload">
+                        <input type="file" id="imageInput" accept="image/*" @change="handleImageUpload">
                     </div>
                     <div class="imagePreview1">
+                        <span class="imageEmpty" v-show="!images.length && isEmpty">Add images</span>
                         <div class="imageCard" v-for="(image, index) in images" :key="index">
                             <img :src="image.image" alt="uploaded Image">
                             <!-- {{ image }} -->
@@ -106,6 +116,7 @@ import dummyImage from "@/assets/Admin/dummyImage.svg"
 export default {
     data() {
         return {
+            isEmpty: false,
             cross,
             dummyImage,
             selectedImage: null,
@@ -172,20 +183,33 @@ export default {
                 salePrice: this.Prsale,
                 imageUrl: this.images
             }
-            try {
-                await this.addProducts(productData)
-                this.message = 'SuccessFully added product!';
-                this.notification = true
+            if (this.Prname == '' || this.Prdesc == '' || this.Prcat == '' || this.Prbrand == '' || this.PrSku == '' || this.Prstock == '' || this.PrPrice == '' || this.Prsale == '' || this.images.length == 0
+            ) {
+                this.notification = true;
+                this.message = "Please add all products to continue"
+                this.isEmpty = true
                 setTimeout(() => {
-                    router.push('/admin/product')
+                    this.notification = false;
+                    this.message = '';
                 }, 3000)
-            } catch (error) {
-                this.message = 'Error adding product'
-                this.notification = true
+            } else {
+                try {
+                    await this.addProducts(productData)
+                    this.message = 'SuccessFully added product!';
+                    this.notification = true
+                    setTimeout(() => {
+                        router.push('/admin/product')
+                    }, 3000)
+                    this.isEmpty = false;
+
+                } catch (error) {
+                    this.message = 'Error adding product'
+                    this.notification = true
+                }
+                setTimeout(() => {
+                    this.notification = false;
+                }, 3000)
             }
-            setTimeout(() => {
-                this.notification = false;
-            }, 3000)
         }
     }
 }
@@ -315,6 +339,14 @@ form {
     flex-direction: column;
     gap: 16px;
     width: 100%;
+}
+
+.formInput span,
+.imageEmpty {
+    font-family: "Rubik";
+    font-style: italic;
+    color: red;
+    padding-left: 20px;
 }
 
 textarea {

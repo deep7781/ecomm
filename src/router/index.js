@@ -2,6 +2,11 @@ import { createRouter, createWebHistory } from "vue-router";
 import store from "@/store";
 
 const routes = [
+    // {
+    //   path: "/loading",
+    //   name: "loading",
+    //   component: () => import("@/components/loading.vue"),
+    // },
   {
     path: "/login",
     name: "Login",
@@ -38,6 +43,9 @@ const routes = [
         path: "/admin/Dashboard",
         name: "dashboard",
         component: () => import("@/views/Admin/Dashboard.vue"),
+        props: (route) => ({
+          message: route.params.message,
+        }),
       },
       {
         path: "/admin/product/new",
